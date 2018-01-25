@@ -5,6 +5,7 @@
 # Import Required Libraries (Standard, Third Party, Local) ********************
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import logging
+import sys
 
 
 # Authorship Info *************************************************************
@@ -32,6 +33,16 @@ class MyHttpRequestHandler(BaseHTTPRequestHandler):
         self.addr = str()
         self.cmd = str()
         BaseHTTPRequestHandler.__init__(self, *args)
+
+
+    def set_headers(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+
+    def do_HEAD(self):
+        self.set_headers()
 
 
     def do_GET(self):
@@ -86,9 +97,6 @@ class MyHttpRequestHandler(BaseHTTPRequestHandler):
             self.status = 'state=' + self.status
 
         # Create and send response back to requester
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        self.message = "<html><body><h1>" + self.status + "</h1></body></html>"
+        self.set_headers()
+        self.message = "<html><body><p>" + self.status + "</p></body></html>"
         self.wfile.write(bytes(self.message, "utf8"))
-        return
